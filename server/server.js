@@ -31,13 +31,22 @@ io.on("connection", (sock) => {
   // acuse a person in a place with a thing
   sock.on("accuse", (text) => {
     const jtext = JSON.parse(text);
-    thegame.accuse(jtext.person, jtext.place, jtext.thing);
+    // is game won?
+    const gamewon = thegame.accuse(jtext.person, jtext.place, jtext.thing);
     const acc = thegame.getAccusations();
     const len = acc.length-1;
+    // set some strings
     const sendback = "You have accused " + acc[len].person + " in the " + acc[len].place + " with the " + acc[len].thing; 
     const announce = thegame.getPlayerNameById(sock.id) + " has accused " + acc[len].person + " in the " + acc[len].place + " with the " + acc[len].thing;
+    // send the strings
     sock.emit("print", sendback);
     sock.broadcast.emit("print", announce);
+
+    if (thegame.is_murder_guessed())
+    {
+      sock.emit("print", "You win");
+      sock.broadcast.emit("print", thegame.getPlayerNameById(sock.id) + " has won the game!");
+    }
   });
   // move left/right
   sock.on("move", (text) => {
