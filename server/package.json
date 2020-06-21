@@ -12,6 +12,7 @@
   "license": "BSD-2-Clause",
   "dependencies": {
     "express": "^4.17.1",
+    "lodash.sample": "^4.2.1",
     "socket.io": "^2.3.0"
   },
   "devDependencies": {

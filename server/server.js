@@ -32,7 +32,12 @@ io.on("connection", (sock) => {
   sock.on("accuse", (text) => {
     const jtext = JSON.parse(text);
     thegame.accuse(jtext.person, jtext.place, jtext.thing);
-    console.log(thegame.getAccusations());
+    const acc = thegame.getAccusations();
+    const len = acc.length-1;
+    const sendback = "You have accused " + acc[len].person + " in the " + acc[len].place + " with the " + acc[len].thing; 
+    const announce = thegame.getPlayerNameById(sock.id) + " has accused " + acc[len].person + " in the " + acc[len].place + " with the " + acc[len].thing;
+    sock.emit("print", sendback);
+    sock.broadcast.emit("print", announce);
   });
   // move left/right
   sock.on("move", (text) => {

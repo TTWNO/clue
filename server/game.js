@@ -1,13 +1,19 @@
+// rai = random array item
+var rai = require('lodash.sample');
+
 class Game {
   constructor()
   {
     this.players = {};
     this.acusations = [];
-    this.all_characters = ["Colonol Mustard", "Professor Plumb", "Scarlet"];
+    this.all_characters = ["Colonol Mustard", "Professor Plumb", "Scarlet", "Mr. Green"];
     this.weapons = ["Wrench", "Pipe", "Rope", "Revolver"];
     this.rooms = ["Library", "Study", "Bathroom"];
     this.characters = ["Colonol Mustard", "Professor Plumb", "Scarlet"];
     this.used_characters = [];
+    // test
+    this.murder = {person: rai(this.all_characters)};
+    console.log(this.murder);
   }
   // uses the index of the items
   accuse(person_i, place_i, thing_i)

@@ -102,6 +102,7 @@ const print_options_set_valid = (l) => {
 sock.on("people-res", print_options_set_valid);
 sock.on("places-res", print_options_set_valid);
 sock.on("things-res", print_options_set_valid);
+sock.on("print", writeLog);
 
 window.onload = () => {
   writeLog("Hello");
