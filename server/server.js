@@ -65,6 +65,11 @@ io.on("connection", (sock) => {
   sock.on("things-req", () => {
     sock.emit("things-res", JSON.stringify(thegame.getThings()));
   });
+  
+  sock.on("start-game", () => {
+    thegame.assign_cards_to_players();
+    thegame.send_card_info_to_players(io);
+  });
 
 });
 

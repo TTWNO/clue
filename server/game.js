@@ -5,8 +5,9 @@ var object_equals = require('lodash.isequal'); // very lazy bastard wrote this
 class Game {
   constructor()
   {
-    // players indexed by name they connected with; no two players may have the same name. Possible issues with this approach.
-    this.players = {};
+    // list of objects of players
+    // players have .id, .name, .character, and .cards which is a list of cards they have in their hand
+    this.players = [];
     // list of accusations {person: , place:, thing};
     this.acusations = [];
     // all characters; never changes
@@ -19,7 +20,30 @@ class Game {
     this.used_characters = [];
     // set murder object to contain a random element from each of the arrays
     this.murder = {person: rai(this.all_characters), place: rai(this.rooms), thing: rai(this.weapons)};
+    // set cards to empty array
+    this.cards = [];
+    // set available cards to only those not representing aspects of the murder
+    this.cards = this.cards.concat(this.all_characters.filter(item => item !== this.murder.person));
+    this.cards = this.cards.concat(this.rooms.filter(item => item !== this.murder.place));
+    this.cards = this.cards.concat(this.weapons.filter(item => item !== this.murder.thing));
     console.log("[MURDER]: " + JSON.stringify(this.murder));
+  }
+
+  // assign cards to players
+  assign_cards_to_players()
+  {
+    for (var i = 0; i < this.cards.length; i++)
+    {
+      this.players[i%this.players.length].cards.push(this.cards[i]);
+    }
+  }
+
+  send_card_info_to_players(io)
+  {
+    for (var player of this.players)
+    {
+      io.to(player.id).emit("print", "Your cards are: " + JSON.stringify(player.cards));
+    }
   }
 
   // is the murder guessed based on current accusations
@@ -56,34 +80,51 @@ class Game {
   }
   getPlayerNameById(id)
   {
-    for (var k in this.players)
+    for (var player of this.players)
     {
-      // if players has id passed in by the variable `id`
-      if (this.players.hasOwnProperty(k) && this.players[k].id == id)
+      if (player.id == id)
       {
-        // return name of player
-        return k;
+        return player.name;
       }
     }
     return undefined;
   }
-  removePlayer(uid, name)
+  getPlayerById(id)
   {
+    return this.players.filter(item => item.id === id);
+  }
+  getPlayerIndexById(id)
+  {
+    for (var i = 0; i < this.players.length; i++)
+    {
+      if (this.players[i].id === id)
+      {
+        return i;
+      }
+    }
+    return undefined;
+  }
+  removePlayer(uid)
+  {
+    const removal_index = this.getPlayerIndexById(uid);
+    const used_characters_index = this.used_characters.findIndex(item => item === this.players[removal_index].character);
+
     // move character back to cahracters from used_characters
-    this.characters.push(this.used_characters[0]);
-    this.used_characters.splice(0, 1);
-    delete this.players[name];
+    this.characters.push(this.players[removal_index].character);
+    this.used_characters.splice(used_characters_index, 1);
+    this.players.splice(removal_index, 1);
   }
   addPlayer(uid, name)
   {
-    this.players[name] = {id: uid, character: this.characters[0], roomid: 0};
+    this.players.push({id: uid, character: this.characters[0], roomid: 0, cards: [], name: name});
     // move character from characters from used_characters
     this.used_characters.push(this.characters[0]);
     this.characters.splice(0, 1);
   }
+  // move player `id` in direction `dir` to new room
   move(id, dir)
   {
-    let pl = this.players[this.getPlayerNameById(id)];
+    let pl = this.players[this.getPlayerIndexById(id)];
     if (dir == "left")
     {
       pl.roomid -= 1;

@@ -46,6 +46,12 @@ const nMode = (e) => {
       mode = Modes.PERSON;
       sock.emit("people-req", {});
       break;
+    case "S":
+      sock.emit("start-game", {});
+      break;
+    case "h":
+      help();
+      break;
     default:
       break;
   }
@@ -99,6 +105,14 @@ const print_options_set_valid = (l) => {
   }
 };
 
+const help = () => {
+  writeLog("h to access this help list");
+  writeLog("c to accuse");
+  writeLog("S to start game with current players");
+  writeLog("a to move to the room left of you");
+  writeLog("d to move to the room right of you");
+};
+
 sock.on("people-res", print_options_set_valid);
 sock.on("places-res", print_options_set_valid);
 sock.on("things-res", print_options_set_valid);
@@ -106,5 +120,6 @@ sock.on("print", writeLog);
 
 window.onload = () => {
   writeLog("Hello");
+  help();
   window.addEventListener("keydown", keyHandle);
 };
