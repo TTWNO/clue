@@ -1,5 +1,5 @@
-# ttrpg.co
-A WIP Table-Top Role-Playing-Game (TTRPG) Service
+# clue
+An accessible class board-game of Clue implementation in Node.js
 
 ### Installation
 
