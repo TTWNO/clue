@@ -1,5 +1,5 @@
 # clue
-An accessible class board-game of Clue implementation in Node.js
+An accessible classic board-game of Clue implementation in Node.js
 
 ### Installation
 
