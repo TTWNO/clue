@@ -7,7 +7,8 @@ var Modes = {
   NORMAL: 0,
   PERSON: 1,
   PLACE: 2,
-  THING: 3
+  THING: 3,
+  REVEAL: 4
 };
 var mode = Modes.NORMAL;
 
@@ -78,6 +79,12 @@ const thingMode = (e) => {
   accuse();
 };
 
+const revealMode = (e) => {
+  console.log("REVEAL!");
+  sock.emit("reveal", JSON.stringify({"reveal-index": e.key}));
+  mode = Modes.NORMAL;
+};
+
 const keyHandle = (e) => {
   switch (mode)
   {
@@ -92,6 +99,9 @@ const keyHandle = (e) => {
       break;
     case Modes.THING:
       thingMode(e);
+      break;
+    case Modes.REVEAL:
+      revealMode(e);
       break;
   }
 };
@@ -113,9 +123,14 @@ const help = () => {
   writeLog("d to move to the room right of you");
 };
 
+const card_reveal_mode = () => {
+  mode = Modes.REVEAL;
+};
+
 sock.on("people-res", print_options_set_valid);
 sock.on("places-res", print_options_set_valid);
 sock.on("things-res", print_options_set_valid);
+sock.on("card-req", card_reveal_mode);
 sock.on("print", writeLog);
 
 window.onload = () => {

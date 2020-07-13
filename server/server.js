@@ -14,12 +14,12 @@ const io = socketio(server);
 
 const Game = logic.Game;
 
-let thegame = new Game();
+let thegame = new Game(io);
 
 io.on("connection", (sock) => {
   // setup connection
   console.log("Welcome, " + sock.id);
-  thegame.addPlayer(sock.id, "Test");
+  thegame.addPlayer(sock, "Test");
   console.log(thegame.getPlayers());
 
   // disconnect
@@ -31,28 +31,17 @@ io.on("connection", (sock) => {
   // acuse a person in a place with a thing
   sock.on("accuse", (text) => {
     const jtext = JSON.parse(text);
-    // is game won?
-    const gamewon = thegame.accuse(jtext.person, jtext.place, jtext.thing);
-    const acc = thegame.getAccusations();
-    const len = acc.length-1;
-    // set some strings
-    const sendback = "You have accused " + acc[len].person + " in the " + acc[len].place + " with the " + acc[len].thing; 
-    const announce = thegame.getPlayerNameById(sock.id) + " has accused " + acc[len].person + " in the " + acc[len].place + " with the " + acc[len].thing;
-    // send the strings
-    sock.emit("print", sendback);
-    sock.broadcast.emit("print", announce);
+    thegame.accuse(sock, jtext);
 
     if (thegame.is_murder_guessed())
     {
-      sock.emit("print", "You win");
-      sock.broadcast.emit("print", thegame.getPlayerNameById(sock.id) + " has won the game!");
+      thegame.winner(sock);
     }
   });
   // move left/right
   sock.on("move", (text) => {
     const jtext = JSON.parse(text);
-    thegame.move(sock.id, jtext.direction);
-    console.log(thegame.getPlayers());
+    thegame.move(sock, jtext);
   });
 
   // client requests data
@@ -68,7 +57,12 @@ io.on("connection", (sock) => {
   
   sock.on("start-game", () => {
     thegame.assign_cards_to_players();
-    thegame.send_card_info_to_players(io);
+    thegame.send_card_info_to_players();
+  });
+
+  sock.on("reveal", (text) => {
+    console.log(JSON.parse(text));
+    thegame.reveal_secret(sock, JSON.parse(text));
   });
 
 });
