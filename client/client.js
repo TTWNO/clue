@@ -134,7 +134,8 @@ sock.on("card-req", card_reveal_mode);
 sock.on("print", writeLog);
 
 window.onload = () => {
-  writeLog("Hello");
+  name = window.prompt("Name:");
+  sock.emit("register-user", JSON.stringify({"name": name}));
   help();
   window.addEventListener("keydown", keyHandle);
 };

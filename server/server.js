@@ -22,6 +22,12 @@ io.on("connection", (sock) => {
   thegame.addPlayer(sock, "Test");
   console.log(thegame.getPlayers());
 
+  sock.on("register-user", (text) => {
+    const jtext = JSON.parse(text);
+    thegame.setPlayerIdsName(sock.id, jtext);
+    sock.emit("print", "Welcome, " + thegame.getPlayerNameById(sock.id));
+  });
+
   // disconnect
   sock.on("disconnect", () => {
     thegame.removePlayer(sock.id, "Test");

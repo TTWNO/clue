@@ -326,6 +326,17 @@ class Game {
   {
     report_not_turn(this.io, id);
   }
+
+  setPlayerIdsName(id, jtext)
+  {
+    for (var player of this.players)
+    {
+      if (player.id === id)
+      {
+        player.name = jtext.name;
+      }
+    }
+  }
 };
 
 // export as Game
